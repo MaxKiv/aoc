@@ -37,7 +37,7 @@ void parse_to_arrays(char *buff, long line_array[2][2]) {
 }
 
 // check if subject is proper subset of target
-int array_is_proper_subset(long subject[2], long target[2]) {
+int range_overlaps(long subject[2], long target[2]) {
   // [2-4], [6-8] -> 0
   // [5-6], [4-6] -> 1
   // [6-6], [4-6] -> 1
@@ -45,10 +45,10 @@ int array_is_proper_subset(long subject[2], long target[2]) {
   return subject[0] >= target[0] && subject[1] <= target[1];
 }
 
-int contains_proper_subset(long line_array[2][2]) {
-  if (array_is_proper_subset(line_array[0], line_array[1])) {
+int overlap_detected(long line_array[2][2]) {
+  if (range_overlaps(line_array[0], line_array[1])) {
     return 1;
-  } else if (array_is_proper_subset(line_array[1], line_array[0])) {
+  } else if (range_overlaps(line_array[1], line_array[0])) {
     return 1;
   } else {
     return 0;
@@ -64,7 +64,7 @@ long process_line(char *buff) {
   parse_to_arrays(buff, line_array);
 
   // calculate proper subsets
-  if (contains_proper_subset(line_array)) {
+  if (overlap_detected(line_array)) {
     printf("proper subset detected!\n");
     line_answer += 1;
   }
