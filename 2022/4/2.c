@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <ctype.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stddef.h>
 
 /* #define TEST */
 #define BUFF_SIZE 255
@@ -36,19 +36,19 @@ void parse_to_arrays(char *buff, long line_array[2][2]) {
   print_state(line_array);
 }
 
-// check if subject is proper subset of target
-int array_is_proper_subset(long subject[2], long target[2]) {
+int range_overlaps(long subject[2], long target[2]) {
   // [2-4], [6-8] -> 0
+  // [2-7], [6-8] -> 1!
   // [5-6], [4-6] -> 1
   // [6-6], [4-6] -> 1
   // [4-6], [4-6] -> 1
-  return subject[0] >= target[0] && subject[1] <= target[1];
+  return subject[0] <= target[0] && subject[1] >= target[0];
 }
 
-int contains_proper_subset(long line_array[2][2]) {
-  if (array_is_proper_subset(line_array[0], line_array[1])) {
+int overlap_detected(long line_array[2][2]) {
+  if (range_overlaps(line_array[0], line_array[1])) {
     return 1;
-  } else if (array_is_proper_subset(line_array[1], line_array[0])) {
+  } else if (range_overlaps(line_array[1], line_array[0])) {
     return 1;
   } else {
     return 0;
@@ -63,9 +63,8 @@ long process_line(char *buff) {
   // input parsing
   parse_to_arrays(buff, line_array);
 
-  // calculate proper subsets
-  if (contains_proper_subset(line_array)) {
-    printf("proper subset detected!\n");
+  if (overlap_detected(line_array)) {
+    printf("overlap detected!\n");
     line_answer += 1;
   }
 
@@ -77,7 +76,7 @@ int main() {
 
   // read input
 #ifdef TEST
-  const char *input_path = "test2";
+  const char *input_path = "test";
 #else
   const char *input_path = "input";
 #endif
