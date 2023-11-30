@@ -21,7 +21,6 @@ int main() {
         calories_max = current_calories;
       }
     }
-    /* printf("current calories: %ld - max: %ld\n", current_calories, calories_max); */
   }
 
   printf("\n***************** A *****************\n");

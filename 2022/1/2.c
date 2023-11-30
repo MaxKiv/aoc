@@ -24,12 +24,10 @@ void print_stuff(long *current_max) {
   printf("\n");
 }
 
-long long_sum(long a, long b) {
-  return a + b;
-}
+long long_sum(long a, long b) { return a + b; }
 
 // might overflow?
-long reduce(long * current_max, long (*fun)(long, long)) {
+long reduce(long *current_max, long (*fun)(long, long)) {
   long out = 0;
   for (size_t i = SIZE - 1; i != -1; i--) {
     out = fun(out, current_max[i]);

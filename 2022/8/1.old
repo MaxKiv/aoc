@@ -1,0 +1,173 @@
+#include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
+#define TEST
+#define BUFF_SIZE 255
+
+#ifdef TEST
+#define GRIDSIZE 5 + 1
+#define SCORESIZE 5
+#elif
+#define GRIDSIZE 100 + 1
+#define SCORESIZE 100
+#endif
+
+void print_grid(char grid[GRIDSIZE][GRIDSIZE]) {
+  for (size_t i = 0; i < GRIDSIZE; i++) {
+    for (size_t j = 0; j < GRIDSIZE; j++) {
+      printf("%c", grid[i][j]);
+    }
+    printf("\n");
+  }
+}
+
+void print_score(int tree_scores[SCORESIZE][SCORESIZE],
+                 char forest_state[GRIDSIZE][GRIDSIZE]) {
+
+  printf("tree_scores:\n");
+  for (size_t i = 0; i < SCORESIZE; i++) {
+    for (size_t j = 0; j < SCORESIZE; j++) {
+      printf("%d", tree_scores[i][j]);
+    }
+    printf("\n");
+  }
+  printf("\n");
+
+  print_grid(forest_state);
+  /* for (size_t i = 0; i < GRIDSIZE; i++) { */
+  /*   for (size_t j = 0; j < GRIDSIZE; j++) { */
+  /*       printf("%c", forest_state[i][j]); */
+  /*     /1* if (tree_scores[i][j] < 4) { *1/ */
+  /*     /1*   printf("%c", forest_state[i][j]); *1/ */
+  /*     /1* } else { *1/ */
+  /*     /1*   printf(" "); *1/ */
+  /*     /1* } *1/ */
+  /*   } */
+  /*   printf("\n"); */
+  /* } */
+}
+
+void parse_input(char *buff, char grid[GRIDSIZE][GRIDSIZE], int in_cnt) {
+  buff[strlen(buff) - 1] = '\0';
+  strncpy(grid[in_cnt], buff, GRIDSIZE);
+}
+
+/* 30373 */
+/* 25512 */
+/* 65332 */
+/* 33549 */
+/* 35390 */
+long parse_grid(char forest_state[GRIDSIZE][GRIDSIZE]) {
+  long answer = 0;
+  // +1 per side of tree where vision is blocked
+  int tree_scores[SCORESIZE][SCORESIZE] = {{}};
+
+  // pass over state to right
+  for (size_t j = 0; j < GRIDSIZE; j++) {
+    printf("\npassing over row %zu\n", j);
+    char max_row = 0;
+    for (size_t i = 0; i < GRIDSIZE; i++) {
+      char current = forest_state[j][i];
+      if (current > max_row) {
+        printf("%c > %d | ", current, max_row);
+        max_row = current;
+      } else {
+        printf("%c < %d | ", current, max_row);
+        // TODO does this corrupt forest_state on last iter?
+        tree_scores[j][i]++;
+      }
+    }
+  }
+
+  /* // pass over state to left */
+  /* for (size_t j = GRIDSIZE - 1; j > 0; j--) { */
+  /*   printf("\npassing over row %zu\n", j); */
+  /*   char max_row = 0; */
+  /*   for (size_t i = GRIDSIZE - 1; i > 0; i--) { */
+  /*     char current = forest_state[j][i]; */
+  /*     if (current >= max_row) { */
+  /*       printf("%c >= %d | ", current, max_row); */
+  /*       max_row = current; */
+  /*     } else { */
+  /*       printf("%c < %d | ", current, max_row); */
+  /*       tree_scores[j][i]++; */
+  /*     } */
+  /*   } */
+  /* } */
+
+  /* // pass over state to below */
+  /* for (size_t j = GRIDSIZE - 1; j > 0; j--) { */
+  /*   printf("\npassing over row %zu\n", j); */
+  /*   char max_row = 0; */
+  /*   for (size_t i = GRIDSIZE - 1; i > 0; i--) { */
+  /*     char current = forest_state[j][i]; */
+  /*     if (current >= max_row) { */
+  /*       printf("%c >= %d | ", current, max_row); */
+  /*       max_row = current; */
+  /*     } else { */
+  /*       printf("%c < %d | ", current, max_row); */
+  /*       tree_scores[j][i]++; */
+  /*     } */
+  /*   } */
+  /* } */
+
+  /* // pass over state from to top */
+  /* for (size_t j = GRIDSIZE - 1; j > 0; j--) { */
+  /*   printf("\npassing over row %zu\n", j); */
+  /*   char max_row = 0; */
+  /*   for (size_t i = GRIDSIZE - 1; i > 0; i--) { */
+  /*     char current = forest_state[j][i]; */
+  /*     if (current > max_row) { */
+  /*       printf("%c >= %d | ", current, max_row); */
+  /*       max_row = current; */
+  /*     } else { */
+  /*       printf("%c < %d | ", current, max_row); */
+  /*       tree_scores[j][i]++; */
+  /*     } */
+  /*   } */
+  /* } */
+
+  print_score(tree_scores, forest_state);
+
+  // reduce tree_scores into answer
+  printf("calculating answer\n");
+  for (size_t j = GRIDSIZE - 1; j > 0; j--) {
+    for (size_t i = GRIDSIZE - 1; i > 0; i--) {
+      char current_score = tree_scores[j][i];
+      if (current_score < 4) {
+        long long_score = (long)current_score;
+        answer += long_score;
+      }
+    }
+  }
+
+  return answer;
+}
+
+int main() {
+  long answer = 0;
+
+  // forest state
+  char forest_state[GRIDSIZE][GRIDSIZE] = {{}};
+
+  // read input
+#ifdef TEST
+  const char *input_path = "test";
+#else
+  const char *input_path = "input";
+#endif
+
+  FILE *fin = fopen(input_path, "r");
+  char buff[BUFF_SIZE];
+  for (size_t i = 0; fgets(buff, BUFF_SIZE, fin) != NULL; i++) {
+    parse_input(buff, forest_state, i);
+  }
+  print_grid(forest_state);
+
+  answer += parse_grid(forest_state);
+
+  printf("\n***************** Answer *****************\n");
+  printf("%ld\n", answer);
+}
