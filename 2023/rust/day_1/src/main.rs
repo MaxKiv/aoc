@@ -13,31 +13,44 @@ const DIGITS: [&str; 9] = [
 ];
 
 fn main() {
-    let mut answer_a : u32 = 0;
+    let input: Vec<String> = io::stdin().lines().filter_map(Result::ok).collect::<Vec<String>>();
 
-    println!("Part A: {}", answer_a);
-
-    for line in io::stdin().lines() {
-        let cur = solve_a(line.as_ref().unwrap());
-        println!("{}: {}", line.unwrap(), cur);
-        answer_a += cur;
-    }
-
-    println!("Part B: {}", answer_b);
-    let mut answer_b : u32 = 0;
+    println!("Part one: {}", part_1(&input));
+    println!("Part two: {}", part_2(&input));
 }
 
-fn solve_a(line : &str) -> u32{
-    line.chars().rev().find_map(|c| c.to_digit(10)).unwrap() + 10 * line.chars().find_map(|c| c.to_digit(10)).unwrap()
+fn part_1(input: &Vec<String>) -> u32 {
+    input.iter().map(|line| parse_line_1(line)).sum()
 }
 
-fn solve_b(line : &str) -> u32{
-    let test : String = String::from("asdstwo1908fivesdf");
-    test.chars()
+fn part_2(input: &Vec<String>) -> u32 {
+    input.iter().map(|line| parse_line_2(line)).sum()
+}
+
+fn parse_line_1(line: &str) -> u32 {
+    line.chars().rev().find_map(|c| c.to_digit(10)).expect(format!("No digit found on line {}",
+    line).as_str())
+    + 10 * line.chars().find_map(|c| c.to_digit(10)).unwrap()
+}
+
+fn parse_line_2(line: &str) -> u32 {
+    let last =
+        (0..line.len())
+            .rev()
+            .find_map(|i| is_slice_a_digit(&line[i..]))
+            .expect( "No first digit found on line: {line}",);
+    let first = (0..line.len())
+        .find_map(|i| is_slice_a_digit(&line[i..]))
+        .expect( "No second digit found on line {line}",);
+    // println!("{}: {} {}", line, first, last);
+    10 * first + last
+}
+
+fn is_slice_a_digit(slice: &str) -> Option<u32> {
+    DIGITS.iter()
         .enumerate()
-        .filter(|&(_, c)| c == DIGITS.iter().chars().next())
-        .peekable( // somehow get next 5 chars "tok" and check for DIGITS.iter().any(|s|
-    // s.contains(tok)
-        )
-
+        .find(|(_, digit)| slice.starts_with(*digit))
+        .map(|(i, _)| i as u32 + 1)
+        .or_else(|| slice.chars().next().unwrap().to_digit(10))
 }
+
