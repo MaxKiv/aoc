@@ -28,9 +28,15 @@ fn part_2(input: &Vec<String>) -> u32 {
 }
 
 fn parse_line_1(line: &str) -> u32 {
-    line.chars().rev().find_map(|c| c.to_digit(10)).expect(format!("No digit found on line {}",
-    line).as_str())
-    + 10 * line.chars().find_map(|c| c.to_digit(10)).unwrap()
+    line.chars()
+        .rev()
+        .find_map(|c| c.to_digit(10))
+        .expect(format!("No digit found on line {}", line).as_str())
+        + 10 * 
+    line
+        .chars()
+        .find_map(|c| c.to_digit(10))
+        .expect(format!("No digit found on line {}", line).as_str())
 }
 
 fn parse_line_2(line: &str) -> u32 {
