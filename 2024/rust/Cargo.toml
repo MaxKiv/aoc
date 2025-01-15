@@ -25,6 +25,9 @@ members = [
     "day_23",
     "day_24",
     "day_25"
-, "shared"]
+]
 
 resolver = "2"
+
+[workspace.dependencies]
+divan = "0.1.17"

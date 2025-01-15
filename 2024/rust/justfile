@@ -1,0 +1,5 @@
+get_day day:
+  aoc download -d {{day}} -y 2024
+
+setup_new_year:
+  ./setup_new_year.sh
