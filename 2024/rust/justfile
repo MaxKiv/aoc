@@ -3,3 +3,6 @@ get_day day:
 
 setup_new_year:
   ./setup_new_year.sh
+
+submit day part answer:
+  aoc submit -d {{day}} {{part}} {{answer}}
