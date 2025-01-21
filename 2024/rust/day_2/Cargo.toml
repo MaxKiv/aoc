@@ -8,7 +8,7 @@ divan = "0.1.17"
 criterion = { version = "0.4", features = ["html_reports"] }
 
 [[bench]]
-name = "divan_bench"
-# name = "criterion_bench"
+# name = "divan_bench"
+name = "criterion_bench"
 harness = false
 

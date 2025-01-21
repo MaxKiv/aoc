@@ -7,7 +7,6 @@ struct Report {
 
 impl From<&str> for Report {
     fn from(value: &str) -> Self {
-        // 7 6 4 2 1
         let vec = value
             .split_whitespace()
             .fold(Vec::<usize>::new(), |mut acc, el| {
@@ -23,33 +22,87 @@ impl From<&str> for Report {
 }
 
 impl Report {
-    fn is_safe(&self) -> bool {
+    // I tried :(
+    fn is_safe_unreadable_slower(&self) -> bool {
         let levels = &self.levels;
-        let is_descending = levels.iter().is_sorted_by(|lhs, rhs| lhs > rhs);
 
-        for (current, next) in levels.iter().zip(levels.iter().skip(1)) {
-            let diff = if is_descending {
-                current.checked_sub(*next)
-            } else {
-                next.checked_sub(*current)
-            };
+        let mut sequence_is_ascending = None;
+        let mut previous_level = levels[0];
+        for level in levels[1..].iter() {
+            match (*level).cmp(&previous_level) {
+                std::cmp::Ordering::Less => {
+                    if sequence_is_ascending.is_none() {
+                        sequence_is_ascending = Some(false);
+                    } else if sequence_is_ascending.is_some_and(|ascending| !ascending) {
+                        if previous_level - level > MAX_SAFE_LEVEL_DIFF {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                std::cmp::Ordering::Greater => {
+                    if sequence_is_ascending.is_none() {
+                        sequence_is_ascending = Some(true);
+                    } else if sequence_is_ascending.is_some_and(|ascending| ascending) {
+                        if level - previous_level > MAX_SAFE_LEVEL_DIFF {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
 
-            if diff.is_none_or(|diff| diff == 0 || diff > MAX_SAFE_LEVEL_DIFF) {
-                return false;
+                std::cmp::Ordering::Equal => {
+                    return false;
+                }
             }
+
+            previous_level = *level;
         }
         true
     }
 }
 
-pub fn run(input: &str) -> (usize, usize) {
-    let mut p1 = 0;
-    for line in input.lines() {
-        let report = Report::from(line);
-        if report.is_safe() {
-            p1 += 1;
-        }
-    }
+fn level_is_safe(level: &[usize]) -> bool {
+    let all_decreasing = level
+        .iter()
+        .zip(level.iter().skip(1))
+        .all(|(current, next)| current > next);
+    let all_increasing = level
+        .iter()
+        .zip(level.iter().skip(1))
+        .all(|(current, next)| current < next);
+    let all_level_safe = level
+        .iter()
+        .zip(level.iter().skip(1))
+        .all(|(current, next)| current.abs_diff(*next) <= MAX_SAFE_LEVEL_DIFF);
+    all_level_safe && (all_increasing || all_decreasing)
+}
 
-    (p1, 0)
+pub fn solve(input: &str) -> (usize, usize) {
+    let p1 = input
+        .lines()
+        .map(Report::from)
+        .filter(|report| level_is_safe(&report.levels))
+        .count();
+
+    let p2 = input
+        .lines()
+        .map(Report::from)
+        .filter(|report| {
+            level_is_safe(&report.levels)
+                || 
+            // check all permutations with 1 level removed
+            (0..report.levels.len())
+                    .map(|idx| {
+                        let mut level = report.levels.clone();
+                        level.remove(idx);
+                        level
+                    })
+                    .any(|level| level_is_safe(&level))
+        })
+        .count();
+
+    (p1, p2)
 }

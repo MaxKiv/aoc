@@ -5,7 +5,7 @@ use std::fs;
 fn bench(bencher: divan::Bencher) {
     bencher.bench(|| {
         let input = fs::read_to_string("input").unwrap();
-        day_2::run(black_box(&input));
+        day_2::solve(black_box(&input));
     });
 }
 
