@@ -24,23 +24,32 @@ impl TryFrom<&str> for Command {
 }
 
 pub fn run(input: &str) -> anyhow::Result<(usize, usize)> {
-    let mut dial = 50isize;
-    let mut cnt = 0;
+    let mut dial: isize = 50;
+    let mut cnt_p1 = 0;
 
-    for line in input.lines() {
+    let mut prev = 0;
+    let mut cnt_p2 = 0;
+
+    for (idx, line) in input.lines().enumerate() {
         let cmd: Command = Command::try_from(line)?;
 
         dial = match cmd {
-            Command::R(r) => dial + r,
-            Command::L(l) => dial - l,
+            Command::R(r) => dial.checked_add(r).unwrap(),
+            Command::L(l) => dial.checked_sub(l).unwrap(),
         };
 
         if dial % 100 == 0 {
-            cnt += 1;
+            cnt_p1 += 1;
         }
 
-        info!("dial {dial} -> cnt {cnt}");
+        let reduce = dial / 100;
+        if prev != reduce {
+            cnt_p2 += prev.abs_diff(reduce)
+        }
+        info!("{idx} - {cmd:?} prev {prev} dial {dial} reduce {reduce} -> p1 {cnt_p1} p2 {cnt_p2}");
+
+        prev = reduce;
     }
 
-    Ok((cnt, 0))
+    Ok((cnt_p1, cnt_p1 + cnt_p2))
 }
