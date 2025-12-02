@@ -1,3 +1,5 @@
+use tracing::info;
+
 #[derive(Debug)]
 pub enum Command {
     R(isize),
@@ -22,9 +24,6 @@ impl TryFrom<&str> for Command {
 }
 
 pub fn run(input: &str) -> anyhow::Result<(usize, usize)> {
-    // let mut c1: Vec<usize> = Vec::with_capacity(1000);
-    // let mut c2: Vec<usize> = Vec::with_capacity(1000);
-
     let mut dial = 50isize;
     let mut cnt = 0;
 
@@ -36,15 +35,11 @@ pub fn run(input: &str) -> anyhow::Result<(usize, usize)> {
             Command::L(l) => dial - l,
         };
 
-        if dial < 0 {
-            dial += 100;
-        }
-        if dial > 99 {
-            dial -= 100;
-        }
-        if dial == 0 {
+        if dial % 100 == 0 {
             cnt += 1;
         }
+
+        info!("dial {dial} -> cnt {cnt}");
     }
 
     Ok((cnt, 0))
